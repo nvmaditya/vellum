@@ -21,6 +21,8 @@
     "format": "prettier --write ."
   },
   "dependencies": {
+    "@capacitor/android": "^8.5.3",
+    "@capacitor/core": "^8.5.3",
     "@electric-sql/pglite": "^0.5.4",
     "@fontsource/atkinson-hyperlegible": "^5.3.0",
     "@fontsource/literata": "^5.3.0",
@@ -84,6 +86,7 @@
     "zustand": "^5.0.0"
   },
   "devDependencies": {
+    "@capacitor/cli": "^8.5.3",
     "@eslint/js": "^9.20.0",
     "@types/node": "^22.16.5",
     "@types/pg": "^8.11.10",

@@ -13,4 +13,12 @@ screenshots/
 .env
 .env.*
 !.env.example
-.DS_Store
+dist-android/
+android/.gradle/
+android/app/build/
+android/build/
+android/local.properties
+android/captures/
+*.apk
+*.keystore
+
