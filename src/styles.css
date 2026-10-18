@@ -630,7 +630,14 @@ input[type="range"].line::-moz-range-thumb {
   color: #8a8175;
   font-family: var(--font-reading-sans);
   font-size: 0.78rem;
-  margin-top: 0.35rem;
+  margin-top: 2rem;
+}
+
+.listen .track {
+  width: 100%;
+  height: 1px;
+  margin-top: 0.45rem;
+  background: #8a8175;
 }
 
 .listen .transport {
@@ -656,6 +663,41 @@ input[type="range"].line::-moz-range-thumb {
   display: inline-flex;
   align-items: center;
   justify-content: center;
+}
+
+.sleep {
+  margin-top: 1.8rem;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.4rem;
+}
+
+.sleep-label {
+  width: 100%;
+  margin: 0 0 0.15rem;
+  color: #8a8175;
+  font-family: var(--font-reading-sans);
+  font-size: 0.68rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.sleep-chip {
+  min-height: 2.4rem;
+  padding: 0 0.75rem;
+  border-radius: 999px;
+  border: 1px solid #3a342c;
+  background: transparent;
+  color: #8a8175;
+  font: inherit;
+  font-family: var(--font-reading-sans);
+  font-size: 0.8rem;
+}
+
+.sleep-chip[data-on="true"] {
+  border-color: #e8e0d4;
+  color: #e8e0d4;
 }
 
 .listen .back-read {

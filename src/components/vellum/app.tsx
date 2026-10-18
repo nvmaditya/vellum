@@ -36,6 +36,8 @@ export function VellumApp() {
         wordIndex={narration.wordIndex}
         speaking={narration.speaking}
         startedAt={narration.startedAt}
+        sleep={narration.sleep}
+        onSleep={narration.chooseSleep}
         onBack={() => setScreen("read")}
         onStart={narration.start}
         onStop={narration.stop}

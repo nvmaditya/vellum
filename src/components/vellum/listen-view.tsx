@@ -23,6 +23,8 @@ export function ListenView({
   wordIndex,
   speaking,
   startedAt,
+  sleep,
+  onSleep,
   onBack,
   onStart,
   onStop,
@@ -34,6 +36,8 @@ export function ListenView({
   wordIndex: number;
   speaking: boolean;
   startedAt: number;
+  sleep: "off" | "15" | "30" | "chapter";
+  onSleep: (mode: "off" | "15" | "30" | "chapter") => void;
   onBack: () => void;
   onStart: (sentenceId: string) => void;
   onStop: () => void;
@@ -88,11 +92,11 @@ export function ListenView({
             "The book is finished."
           )}
         </p>
-        <div className="times" style={{ marginTop: "2rem" }}>
+        <div className="times">
           <span>{clock(elapsed)}</span>
           <span>{`−${clock(remain)}`}</span>
         </div>
-        <div className="hairline" style={{ width: "100%", marginTop: "0.45rem" }} />
+        <div className="track" />
         <div className="transport">
           <button type="button" className="icon-btn" aria-label="Previous sentence" onClick={() => skip(-1)}>
             <SkipBack size={22} strokeWidth={1.5} />
@@ -112,6 +116,28 @@ export function ListenView({
           <button type="button" className="icon-btn" aria-label="Next sentence" onClick={() => skip(1)}>
             <SkipForward size={22} strokeWidth={1.5} />
           </button>
+        </div>
+        <div className="sleep" role="group" aria-label="Sleep">
+          <p className="sleep-label">Sleep</p>
+          {(
+            [
+              ["off", "Off"],
+              ["15", "15"],
+              ["30", "30"],
+              ["chapter", "Chapter"],
+            ] as const
+          ).map(([mode, label]) => (
+            <button
+              key={mode}
+              type="button"
+              className="sleep-chip"
+              data-on={sleep === mode}
+              aria-pressed={sleep === mode}
+              onClick={() => onSleep(mode)}
+            >
+              {label}
+            </button>
+          ))}
         </div>
         <button type="button" className="back-read" onClick={onBack}>
           Back to the page
