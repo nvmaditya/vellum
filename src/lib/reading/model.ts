@@ -42,6 +42,7 @@ export type Settings = {
   margin: MarginId;
   rate: number;
   voice: VoiceId;
+  flow: "scroll" | "page";
 };
 
 export type Spoken = {
@@ -98,6 +99,7 @@ export const defaultSettings: Settings = {
   margin: "medium",
   rate: 1,
   voice: "mara",
+  flow: "scroll",
 };
 
 const CHAPTER_WORDS = [

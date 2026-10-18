@@ -196,13 +196,29 @@
 }
 
 .icon-btn,
+.text-btn,
+.chrome-title,
+.chapter-link,
+.font-sample {
+  cursor: pointer;
+}
+
+.icon-btn:active,
+.text-btn:active,
+.chrome-title:active,
+.chapter-link:active,
+.font-sample:active {
+  opacity: 0.55;
+}
+
+.icon-btn,
 .text-btn {
   border: 0;
   background: transparent;
   color: var(--fg);
   font: inherit;
-  min-width: 2.75rem;
-  min-height: 2.75rem;
+  min-width: 3rem;
+  min-height: 3rem;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -241,6 +257,84 @@
   background: color-mix(in srgb, var(--sheet) 92%, var(--bg));
   border-top: 1px solid var(--rule);
   font-family: var(--font-reading-sans);
+}
+
+.stage[data-flow="scroll"] .chrome {
+  position: relative;
+  order: 0;
+  flex: none;
+  background: var(--bg);
+  border-bottom: 1px solid var(--rule);
+  padding-top: max(0.35rem, env(safe-area-inset-top));
+}
+
+.scroller {
+  order: 1;
+  flex: 1;
+  min-height: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 1.5rem 0 2.2rem;
+}
+
+.scroll-column h1,
+.scroll-column h2,
+.scroll-column p {
+  margin: 0;
+}
+
+.scroll-column h1 {
+  font-size: 1.72em;
+  line-height: 1.18;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  margin-bottom: 0.85rem;
+}
+
+.scroll-column h2 {
+  font-size: 1.22em;
+  line-height: 1.25;
+  font-weight: 600;
+  margin-top: 1.6rem;
+}
+
+.scroll-column p + p {
+  margin-top: 0.85em;
+}
+
+.scroll-column .kicker {
+  margin-top: 2.2rem;
+}
+
+.scroll-column section:first-child .kicker {
+  margin-top: 0;
+}
+
+.reader-foot {
+  order: 2;
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.2rem 0.7rem max(0.35rem, env(safe-area-inset-bottom));
+  border-top: 1px solid var(--rule);
+  background: var(--bg);
+  color: var(--muted);
+  font-family: var(--font-reading-sans);
+  font-size: 0.78rem;
+}
+
+.reader-foot .hairline {
+  flex: 1;
+  height: 1px;
+  background: var(--fg);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .scroller {
+    scroll-behavior: auto;
+  }
 }
 
 .sheet-backdrop {
@@ -425,7 +519,7 @@
   border: 0;
   color: var(--muted);
   font: inherit;
-  min-height: 2.75rem;
+  min-height: 3rem;
   padding: 0.35rem 0;
 }
 

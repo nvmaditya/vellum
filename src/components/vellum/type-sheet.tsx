@@ -14,6 +14,26 @@ export function TypeSheet({ settings, onClose }: { settings: Settings; onClose: 
       <button type="button" className="sheet-backdrop" aria-label="Close type settings" onClick={onClose} />
       <div className="sheet" role="dialog" aria-label="Type">
         <div className="grabber" />
+        <p className="section-label">Reading</p>
+        <div className="font-grid">
+          {(
+            [
+              ["scroll", "Scroll"],
+              ["page", "Page"],
+            ] as const
+          ).map(([id, label]) => (
+            <button
+              key={id}
+              type="button"
+              className="font-sample"
+              data-on={settings.flow === id}
+              aria-pressed={settings.flow === id}
+              onClick={() => updateSettings({ flow: id })}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
         <p className="aa">Aa</p>
         <div className="size-row">
           <span className="a-small" aria-hidden="true">
