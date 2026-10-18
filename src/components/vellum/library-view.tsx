@@ -1,6 +1,7 @@
 import { useRef, useState } from "react";
 import { CoverMark } from "@/components/vellum/mark";
 import { bookPercent, chapterKicker, spokenIn, type Book } from "@/lib/reading/model";
+import { APP_VERSION } from "@/lib/reading/version";
 import { parseEpub } from "@/lib/reading/epub";
 import { addBook, removeBook, setNotice, type LibraryState } from "@/lib/reading/store";
 
@@ -90,6 +91,7 @@ export function LibraryView({
             {library.notice}
           </p>
           <p className="book-meta">Tap the middle of a page for type and voice.</p>
+          <p className="book-meta">v{APP_VERSION}</p>
         </div>
       </main>
     </div>

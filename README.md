@@ -19,4 +19,4 @@ npm install
 npm run dev
 ```
 
-The dev server listens on port 8080.
+Pre-releases live on GitHub as `v0.x.y`. The library shows the version you are running.
