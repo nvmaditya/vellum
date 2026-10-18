@@ -27,11 +27,18 @@ function sentenceIdsOf(slices: PageSlice[]) {
   });
 }
 
-export function paginateBook(book: Book, width: number, height: number, fontSize: number, family: string): Page[] {
+export function paginateBook(
+  book: Book,
+  width: number,
+  height: number,
+  fontSize: number,
+  family: string,
+  lineHeight: number,
+): Page[] {
   if (width < 40 || height < 80) return [];
   const host = document.createElement("div");
   host.className = "page-column";
-  host.style.cssText = `position:absolute;visibility:hidden;pointer-events:none;left:0;top:0;width:${width}px;height:auto;overflow:visible;font-family:${family};font-size:${fontSize}px;`;
+  host.style.cssText = `position:absolute;visibility:hidden;pointer-events:none;left:0;top:0;width:${width}px;height:auto;overflow:visible;font-family:${family};font-size:${fontSize}px;line-height:${lineHeight};`;
   document.body.appendChild(host);
 
   const measure = (node: HTMLElement) => {

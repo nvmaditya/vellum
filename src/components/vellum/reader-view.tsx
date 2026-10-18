@@ -3,6 +3,8 @@ import { ChevronLeft, Headphones, Pause, Play } from "lucide-react";
 import { TypeSheet } from "@/components/vellum/type-sheet";
 import { Words } from "@/components/vellum/words";
 import {
+  LEADING_OPTIONS,
+  MARGIN_OPTIONS,
   RATE_STEPS,
   VOICE_OPTIONS,
   bookPercent,
@@ -58,6 +60,8 @@ export function ReaderView({
   const [sheet, setSheet] = useState<"type" | "contents" | null>(null);
   const family = fontFamily(settings.font);
   const size = fontSize(settings.sizeIndex);
+  const leading = LEADING_OPTIONS.find((item) => item.id === settings.leading)?.value ?? 1.55;
+  const margin = MARGIN_OPTIONS.find((item) => item.id === settings.margin)?.value ?? "1.7rem";
   const spoken = spokenIn(book);
   const current = spoken.find((item) => item.id === sentenceId) ?? spoken[0];
   const found = pages.findIndex((page) => sentenceId != null && page.sentenceIds.includes(sentenceId));
@@ -78,6 +82,7 @@ export function ReaderView({
         columnRef.current.clientHeight,
         size,
         family,
+        leading,
       );
       setPages(next);
     };
@@ -88,7 +93,7 @@ export function ReaderView({
       cancelled = true;
       observer.disconnect();
     };
-  }, [book, family, size]);
+  }, [book, family, size, leading]);
 
   function go(delta: number) {
     const nextIndex = Math.min(pages.length - 1, Math.max(0, pageIndex + delta));
@@ -184,16 +189,16 @@ export function ReaderView({
   return (
     <div className="desk" data-theme={settings.theme} data-screen="read">
       <section className="stage">
-        <div className="frame" onClick={onFrameClick}>
+        <div className="frame" style={{ paddingLeft: margin, paddingRight: margin }} onClick={onFrameClick}>
           <article
             ref={columnRef}
             className="page-column"
-            style={{ fontFamily: family, fontSize: size }}
+            style={{ fontFamily: family, fontSize: size, lineHeight: leading }}
           >
             {page ? page.slices.map(renderSlice) : <h1>{book.chapters[0]?.title ?? book.title}</h1>}
           </article>
         </div>
-        <div className="progress-row">
+        <div className="progress-row" style={{ paddingLeft: margin, paddingRight: margin }}>
           <div className="hairline" />
           <span>{bookPercent(book, sentenceId)}%</span>
         </div>

@@ -31,10 +31,15 @@ export type PageSlice =
   | { type: "heading"; text: string; sentenceId: string }
   | { type: "sentences"; sentences: Sentence[] };
 
+export type LeadingId = "tight" | "normal" | "loose";
+export type MarginId = "narrow" | "medium" | "wide";
+
 export type Settings = {
   font: FontId;
   sizeIndex: number;
   theme: ThemeId;
+  leading: LeadingId;
+  margin: MarginId;
   rate: number;
   voice: VoiceId;
 };
@@ -73,10 +78,24 @@ export const VOICE_OPTIONS: { id: VoiceId; label: string }[] = [
 export const SIZE_STEPS = [18, 20, 22, 25, 28, 32, 36];
 export const RATE_STEPS = [0.85, 1, 1.15, 1.3, 1.5];
 
+export const LEADING_OPTIONS: { id: LeadingId; label: string; value: number }[] = [
+  { id: "tight", label: "Tight", value: 1.35 },
+  { id: "normal", label: "Normal", value: 1.55 },
+  { id: "loose", label: "Loose", value: 1.8 },
+];
+
+export const MARGIN_OPTIONS: { id: MarginId; label: string; value: string }[] = [
+  { id: "narrow", label: "Narrow", value: "1.05rem" },
+  { id: "medium", label: "Medium", value: "1.7rem" },
+  { id: "wide", label: "Wide", value: "2.45rem" },
+];
+
 export const defaultSettings: Settings = {
   font: "literata",
   sizeIndex: 2,
   theme: "paper",
+  leading: "normal",
+  margin: "medium",
   rate: 1,
   voice: "mara",
 };

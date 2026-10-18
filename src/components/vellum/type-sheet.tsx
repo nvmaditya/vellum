@@ -1,5 +1,7 @@
 import {
   FONT_OPTIONS,
+  LEADING_OPTIONS,
+  MARGIN_OPTIONS,
   THEME_OPTIONS,
   VOICE_OPTIONS,
   type Settings,
@@ -45,6 +47,34 @@ export function TypeSheet({ settings, onClose }: { settings: Settings; onClose: 
                 Reading
               </span>
               <span className="fname">{font.label}</span>
+            </button>
+          ))}
+        </div>
+        <p className="section-label spaced">Spacing</p>
+        <div className="chip-row">
+          {LEADING_OPTIONS.map((leading) => (
+            <button
+              key={leading.id}
+              type="button"
+              className="chip"
+              data-on={settings.leading === leading.id}
+              onClick={() => updateSettings({ leading: leading.id })}
+            >
+              {leading.label}
+            </button>
+          ))}
+        </div>
+        <p className="section-label spaced">Margins</p>
+        <div className="chip-row">
+          {MARGIN_OPTIONS.map((margin) => (
+            <button
+              key={margin.id}
+              type="button"
+              className="chip"
+              data-on={settings.margin === margin.id}
+              onClick={() => updateSettings({ margin: margin.id })}
+            >
+              {margin.label}
             </button>
           ))}
         </div>

@@ -394,8 +394,26 @@
   gap: 0.25rem;
 }
 
-.sheet-note {
-  margin-top: 0.35rem;
+.chip-row {
+  display: flex;
+  gap: 0.45rem;
+}
+
+.chip {
+  flex: 1;
+  min-height: 2.6rem;
+  border-radius: 999px;
+  border: 1px solid var(--rule);
+  background: transparent;
+  color: var(--muted);
+  font: inherit;
+  font-family: var(--font-reading-sans);
+  font-size: 0.85rem;
+}
+
+.chip[data-on="true"] {
+  border-color: var(--fg);
+  color: var(--fg);
 }
 
 .choice,
