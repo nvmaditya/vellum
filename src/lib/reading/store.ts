@@ -5,7 +5,7 @@ import {
   type Book,
   type Settings,
 } from "@/lib/reading/model";
-import { sampleBook } from "@/lib/reading/sample";
+import { includedBook } from "@/lib/reading/included";
 
 const KEY = "vellum-v1";
 
@@ -23,7 +23,7 @@ export type LibraryState = {
   notice: string;
 };
 
-const sample = sampleBook();
+const sample = includedBook();
 
 let state: LibraryState = {
   books: [sample],

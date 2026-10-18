@@ -77,14 +77,10 @@ export function ReaderView({
     let cancelled = false;
     const run = () => {
       if (cancelled || !columnRef.current) return;
-      const next = paginateBook(
-        book,
-        columnRef.current.clientWidth,
-        columnRef.current.clientHeight,
-        size,
-        family,
-        leading,
-      );
+      const width = columnRef.current.clientWidth;
+      const measured = columnRef.current.clientHeight;
+      const height = measured >= 80 ? measured : Math.max(280, window.innerHeight - 150);
+      const next = paginateBook(book, width, height, size, family, leading);
       setPages(next);
     };
     void document.fonts.ready.then(run);
@@ -157,7 +153,7 @@ export function ReaderView({
     }
     if (slice.type === "title" || slice.type === "heading") {
       const Tag = slice.type === "title" ? "h1" : "h2";
-      const active = slice.sentenceId === sentenceId;
+      const active = speaking && slice.sentenceId === sentenceId;
       return (
         <Tag key={sliceKey(slice)}>
           <span data-sentence={slice.sentenceId} className={active ? "live-sentence" : undefined}>

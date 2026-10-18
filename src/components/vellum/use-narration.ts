@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { gapBetween, spokenIn, type Book, type Settings } from "@/lib/reading/model";
 import { getLibrary } from "@/lib/reading/store";
-import { cancelSpeech, sleep as wait, speakSentence } from "@/lib/reading/speech";
+import { cancelSpeech, installSpeechHooks, sleep as wait, speakSentence } from "@/lib/reading/speech";
 
 export function useNarration(book: Book | null, settings: Settings) {
   const settingsRef = useRef(settings);
@@ -40,7 +40,6 @@ export function useNarration(book: Book | null, settings: Settings) {
     if (!current) return;
     const run = (runRef.current += 1);
     cancelSpeech();
-    await wait(40);
     if (run !== runRef.current) return;
     setSpeaking(true);
     setVoiceNote("");
@@ -95,18 +94,31 @@ export function useNarration(book: Book | null, settings: Settings) {
   }, [book]);
 
   useEffect(() => {
+    installSpeechHooks();
+    const kick = window.setInterval(() => {
+      const synth = window.speechSynthesis;
+      if (synth?.speaking) synth.resume();
+    }, 5000);
+    return () => window.clearInterval(kick);
+  }, []);
+
+  useEffect(() => {
     const session = navigator.mediaSession;
     const current = bookRef.current;
     if (!session || !current) return;
     const flat = spokenIn(current);
     const item = flat.find((entry) => entry.id === sentenceId) ?? flat[0];
     if (!item) return;
-    session.metadata = new MediaMetadata({
-      title: current.title,
-      artist: item.chapterTitle,
-      album: "Vellum",
-    });
-    session.playbackState = speaking ? "playing" : "paused";
+    try {
+      session.metadata = new MediaMetadata({
+        title: current.title,
+        artist: item.chapterTitle,
+        album: "Vellum",
+      });
+      session.playbackState = speaking ? "playing" : "paused";
+    } catch {
+      return;
+    }
     const jump = (delta: number) => {
       const index = flat.findIndex((entry) => entry.id === item.id);
       const next = flat[index + delta];

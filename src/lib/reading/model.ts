@@ -53,7 +53,7 @@ export type Spoken = {
   lastInBlock: boolean;
 };
 
-export const SAMPLE_ID = "night-market";
+export const SAMPLE_ID = "propaganda";
 
 export const FONT_OPTIONS: { id: FontId; label: string; family: string }[] = [
   { id: "literata", label: "Literata", family: '"Literata", Palatino, "Palatino Linotype", serif' },
