@@ -1,5 +1,5 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
-import { ChevronLeft, Headphones, Pause, Play } from "lucide-react";
+import { Bookmark, ChevronLeft, Headphones, Pause, Play } from "lucide-react";
 import { TypeSheet } from "@/components/vellum/type-sheet";
 import { Words } from "@/components/vellum/words";
 import {
@@ -17,7 +17,7 @@ import {
   type Settings,
 } from "@/lib/reading/model";
 import { paginateBook, type Page } from "@/lib/reading/paginate";
-import { updateSettings } from "@/lib/reading/store";
+import { toggleBookmark, updateSettings, useLibrary } from "@/lib/reading/store";
 
 function rateLabel(rate: number) {
   return Number.isInteger(rate) ? `${rate.toFixed(1)}×` : `${rate}×`;
@@ -58,6 +58,7 @@ export function ReaderView({
   const [pages, setPages] = useState<Page[]>([]);
   const [chrome, setChrome] = useState(false);
   const [sheet, setSheet] = useState<"type" | "contents" | null>(null);
+  const library = useLibrary();
   const family = fontFamily(settings.font);
   const size = fontSize(settings.sizeIndex);
   const leading = LEADING_OPTIONS.find((item) => item.id === settings.leading)?.value ?? 1.55;
@@ -185,6 +186,8 @@ export function ReaderView({
   }
 
   const voice = VOICE_OPTIONS.find((item) => item.id === settings.voice) ?? VOICE_OPTIONS[0];
+  const saved = library.bookmarks.filter((mark) => mark.bookId === book.id);
+  const hereSaved = current ? saved.some((mark) => mark.sentenceId === current.id) : false;
 
   return (
     <div className="desk" data-theme={settings.theme} data-screen="read">
@@ -212,6 +215,20 @@ export function ReaderView({
             </button>
             <button type="button" className="text-btn" aria-label="Type settings" onClick={() => setSheet("type")}>
               Aa
+            </button>
+            <button
+              type="button"
+              className="icon-btn"
+              data-on={hereSaved}
+              aria-label={hereSaved ? "Remove bookmark" : "Save this place"}
+              aria-pressed={hereSaved}
+              onClick={() => {
+                if (!current) return;
+                const snippet = current.text.length > 64 ? `${current.text.slice(0, 64)}…` : current.text;
+                toggleBookmark(book.id, current.id, `${chapterKicker(current.chapterIndex)} · ${snippet}`);
+              }}
+            >
+              <Bookmark size={18} strokeWidth={1.5} fill={hereSaved ? "currentColor" : "none"} />
             </button>
             <button type="button" className="icon-btn" aria-label="Listen with the screen off" onClick={onListen}>
               <Headphones size={20} strokeWidth={1.5} />
@@ -280,6 +297,27 @@ export function ReaderView({
             <button type="button" className="sheet-backdrop" aria-label="Close contents" onClick={() => setSheet(null)} />
             <div className="sheet" role="dialog" aria-label="Contents">
               <div className="grabber" />
+              {saved.length ? (
+                <>
+                  <p className="section-label">Saved</p>
+                  <div className="contents">
+                    {saved.map((mark) => (
+                      <button
+                        key={mark.sentenceId}
+                        type="button"
+                        className="chapter-link"
+                        onClick={() => {
+                          if (speaking) onStart(mark.sentenceId);
+                          else onPlace(mark.sentenceId);
+                          setSheet(null);
+                        }}
+                      >
+                        <span>{mark.label}</span>
+                      </button>
+                    ))}
+                  </div>
+                </>
+              ) : null}
               <p className="section-label">Contents</p>
               <div className="contents">
                 {book.chapters.map((chapter, index) => (

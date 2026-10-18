@@ -8,8 +8,8 @@ The same place in the book is shared between reading and listening. While the vo
 
 - Library, with an included story and epub import
 - Paged reading, contents, and progress
-- Type sheet: size, Literata, Newsreader, Sans, Atkinson, and paper, sepia, gray, or night
-- Read-along, and a dark listen screen that keeps playing
+- Type sheet: size, spacing, margins, Literata, Newsreader, Sans, Atkinson, and paper, sepia, gray, or night
+- Read-along, bookmarks, and a dark listen screen that keeps playing
 - Voices Mara, Jonah, and Helen, using the best matching English voice on the device
 
 ## Run
