@@ -19,4 +19,3 @@ npm install
 npm run dev
 ```
 
-Pre-releases live on GitHub as `v0.x.y`. The library shows the version you are running.
