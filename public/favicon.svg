@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" role="img" aria-label="Vellum">
+  <rect width="32" height="32" rx="6" fill="#1B2A4A"/>
+  <polygon points="6,7 26,7 6,25" fill="#F3EEE6"/>
+  <polygon points="6,7 15,7 6,15" fill="#F6D7A8"/>
+</svg>
