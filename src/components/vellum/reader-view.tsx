@@ -60,7 +60,10 @@ export function ReaderView({
   const swiped = useRef(false);
   const point = useRef<{ x: number; y: number } | null>(null);
   const placedBook = useRef<string | null>(null);
+  const landRef = useRef<"start" | "end">("start");
+  const anchorRef = useRef<{ id: string; top: number } | null>(null);
   const [pages, setPages] = useState<Page[]>([]);
+  const [span, setSpan] = useState({ start: 0, end: 0 });
   const [chrome, setChrome] = useState(false);
   const [sheet, setSheet] = useState<"type" | "contents" | null>(null);
   const library = useLibrary();
@@ -75,6 +78,7 @@ export function ReaderView({
   const page = pages[pageIndex];
   const chapterItems = spoken.filter((item) => item.chapterIndex === (current?.chapterIndex ?? 0));
   const chapterCursor = Math.max(0, chapterItems.findIndex((item) => item.id === current?.id));
+  const chapterIndex = current?.chapterIndex ?? 0;
 
   useLayoutEffect(() => {
     const node = columnRef.current;
@@ -85,7 +89,7 @@ export function ReaderView({
       const width = columnRef.current.clientWidth;
       const measured = columnRef.current.clientHeight;
       const height = measured >= 80 ? measured : Math.max(280, window.innerHeight - 150);
-      const next = paginateBook(book, width, height, size, family, leading);
+      const next = paginateBook(book, width, height, size, family, leading, chapterIndex);
       setPages(next);
     };
     void document.fonts.ready.then(run);
@@ -95,10 +99,22 @@ export function ReaderView({
       cancelled = true;
       observer.disconnect();
     };
-  }, [book, family, size, leading]);
+  }, [book, family, size, leading, chapterIndex]);
 
   function go(delta: number) {
-    const nextIndex = Math.min(pages.length - 1, Math.max(0, pageIndex + delta));
+    const nextIndex = pageIndex + delta;
+    if (nextIndex >= pages.length) {
+      const next = book.chapters[chapterIndex + 1];
+      if (next) jumpTo(next.titleSentenceId);
+      return;
+    }
+    if (nextIndex < 0) {
+      const prev = book.chapters[chapterIndex - 1];
+      if (!prev) return;
+      landRef.current = "end";
+      jumpTo(prev.titleSentenceId);
+      return;
+    }
     const id = pages[nextIndex]?.sentenceIds[0];
     if (!id || nextIndex === pageIndex) return;
     if (speaking) onStart(id);
@@ -118,6 +134,12 @@ export function ReaderView({
 
   function jumpTo(id: string) {
     jumpRef.current = true;
+    const index = book.chapters.findIndex(
+      (chapter) =>
+        chapter.titleSentenceId === id ||
+        chapter.blocks.some((block) => block.sentences.some((sentence) => sentence.id === id)),
+    );
+    if (index >= 0) setSpan({ start: index, end: index });
     if (speaking) onStart(id);
     else onPlace(id);
     if (scrolling) scrollToSentence(id);
@@ -129,12 +151,48 @@ export function ReaderView({
   speakingRef.current = speaking;
   const sentenceRef = useRef(sentenceId);
   sentenceRef.current = sentenceId;
+  const chapterRef = useRef(chapterIndex);
+  chapterRef.current = chapterIndex;
 
   useEffect(() => {
+    if (!sentenceId || placedBook.current === book.id) return;
+    const index = book.chapters.findIndex(
+      (chapter) =>
+        chapter.titleSentenceId === sentenceId ||
+        chapter.blocks.some((block) => block.sentences.some((sentence) => sentence.id === sentenceId)),
+    );
+    setSpan({ start: Math.max(0, index), end: Math.max(0, index) });
+  }, [book, sentenceId]);
+
+  useLayoutEffect(() => {
     if (!scrolling || !sentenceId || placedBook.current === book.id) return;
+    const root = scrollRef.current;
+    const node = root?.querySelector(`[data-sentence="${CSS.escape(sentenceId)}"]`);
+    if (!(node instanceof HTMLElement)) return;
     placedBook.current = book.id;
     scrollToSentence(sentenceId);
-  }, [book.id, scrolling, sentenceId]);
+  }, [book.id, scrolling, sentenceId, span.start, span.end]);
+
+  useLayoutEffect(() => {
+    const root = scrollRef.current;
+    const anchor = anchorRef.current;
+    if (!root || !anchor) return;
+    const node = root.querySelector(`[data-sentence="${CSS.escape(anchor.id)}"]`);
+    if (node instanceof HTMLElement) {
+      const delta = node.getBoundingClientRect().top - anchor.top;
+      if (Math.abs(delta) > 1) root.scrollTop += delta;
+    }
+    anchorRef.current = null;
+  }, [span.start, span.end]);
+
+  useEffect(() => {
+    if (landRef.current !== "end" || scrolling || pages.length === 0) return;
+    const id = pages[pages.length - 1]?.sentenceIds.at(-1);
+    landRef.current = "start";
+    if (!id) return;
+    if (speaking) onStart(id);
+    else onPlace(id);
+  }, [pages, scrolling, speaking, onStart, onPlace]);
 
   useEffect(() => {
     if (!scrolling || !sentenceId) return;
@@ -168,6 +226,27 @@ export function ReaderView({
           }
         }
         if (id && id !== sentenceRef.current) onPlace(id);
+        const last = book.chapters.length - 1;
+        const index = chapterRef.current;
+        const fromBottom = root.scrollHeight - root.scrollTop - root.clientHeight;
+        const short = root.scrollHeight <= root.clientHeight + 48;
+        setSpan((currentSpan) => {
+          let { start, end } = currentSpan;
+          if ((fromBottom < 900 || short) && end < last) end += 1;
+          else if (root.scrollTop < 480 && start > 0 && index <= start) start -= 1;
+          if (root.scrollHeight > root.clientHeight + 900 && end - start > 1) {
+            start = Math.max(0, index);
+            end = Math.min(last, index + 1);
+          }
+          if (start === currentSpan.start && end === currentSpan.end) return currentSpan;
+          if (id) {
+            const mark = root.querySelector(`[data-sentence="${CSS.escape(id)}"]`);
+            if (mark instanceof HTMLElement) {
+              anchorRef.current = { id, top: mark.getBoundingClientRect().top };
+            }
+          }
+          return { start, end };
+        });
       });
     };
     root.addEventListener("scroll", onScroll, { passive: true });
@@ -175,7 +254,7 @@ export function ReaderView({
       root.removeEventListener("scroll", onScroll);
       window.cancelAnimationFrame(frame);
     };
-  }, [scrolling, book.id, onPlace]);
+  }, [scrolling, book.id, book.chapters.length, onPlace]);
 
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => {
@@ -299,8 +378,10 @@ export function ReaderView({
               className="scroll-column"
               style={{ fontFamily: family, fontSize: size, lineHeight: leading, paddingLeft: margin, paddingRight: margin }}
             >
-              {book.chapters.map((chapter, index) => (
-                <section key={chapter.id}>
+              {book.chapters.slice(span.start, span.end + 1).map((chapter) => {
+                const index = book.chapters.indexOf(chapter);
+                return (
+                <section key={chapter.id} data-chapter={index}>
                   <p className="kicker">{chapterKicker(index)}</p>
                   <h1>
                     <span
@@ -335,7 +416,8 @@ export function ReaderView({
                     );
                   })}
                 </section>
-              ))}
+                );
+              })}
             </article>
           </div>
         ) : (

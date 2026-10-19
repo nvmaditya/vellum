@@ -34,6 +34,7 @@ export function paginateBook(
   fontSize: number,
   family: string,
   lineHeight: number,
+  onlyChapter?: number,
 ): Page[] {
   if (width < 40 || height < 80) return [];
   const host = document.createElement("div");
@@ -78,7 +79,9 @@ export function paginateBook(
     used += gap + heightOf;
   };
 
-  for (let index = 0; index < book.chapters.length; index += 1) {
+  const first = onlyChapter ?? 0;
+  const last = onlyChapter == null ? book.chapters.length : Math.min(book.chapters.length, onlyChapter + 1);
+  for (let index = first; index < last; index += 1) {
     const chapter = book.chapters[index];
     const kicker = document.createElement("div");
     kicker.className = "kicker";

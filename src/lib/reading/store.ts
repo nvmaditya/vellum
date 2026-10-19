@@ -1,11 +1,9 @@
 import { useSyncExternalStore } from "react";
 import {
   defaultSettings,
-  SAMPLE_ID,
   type Book,
   type Settings,
 } from "@/lib/reading/model";
-import { includedBook } from "@/lib/reading/included";
 
 const KEY = "vellum-v1";
 
@@ -23,10 +21,8 @@ export type LibraryState = {
   notice: string;
 };
 
-const sample = includedBook();
-
 let state: LibraryState = {
-  books: [sample],
+  books: [],
   settings: defaultSettings,
   positions: {},
   bookmarks: [],
@@ -46,7 +42,7 @@ function persist() {
       settings: state.settings,
       positions: state.positions,
       bookmarks: state.bookmarks,
-      books: state.books.filter((book) => book.id !== SAMPLE_ID),
+      books: state.books,
     };
     localStorage.setItem(KEY, JSON.stringify(payload));
     if (state.notice.startsWith("This browser")) {
@@ -80,11 +76,9 @@ export function hydrateLibrary() {
     const raw = localStorage.getItem(KEY);
     if (!raw) return;
     const parsed = JSON.parse(raw) as Partial<LibraryState>;
-    const imported = Array.isArray(parsed.books)
-      ? parsed.books.filter(isBook).filter((book) => book.id !== SAMPLE_ID)
-      : [];
+    const imported = Array.isArray(parsed.books) ? parsed.books.filter(isBook) : [];
     state = {
-      books: [sample, ...imported],
+      books: imported,
       settings: { ...defaultSettings, ...(parsed.settings ?? {}) },
       positions:
         parsed.positions && typeof parsed.positions === "object" ? parsed.positions : {},
@@ -93,7 +87,7 @@ export function hydrateLibrary() {
     };
     emit();
   } catch {
-    state = { ...state, notice: "Saved books couldn't be read. The sample is still here." };
+    state = { ...state, notice: "Saved books couldn't be read." };
     emit();
   }
 }
@@ -144,14 +138,13 @@ export function addBook(book: Book) {
   state = {
     ...state,
     notice: "",
-    books: [sample, book, ...state.books.filter((item) => item.id !== SAMPLE_ID && item.id !== book.id)],
+    books: [book, ...state.books.filter((item) => item.id !== book.id)],
   };
   persist();
   emit();
 }
 
 export function removeBook(bookId: string) {
-  if (bookId === SAMPLE_ID) return;
   const positions = { ...state.positions };
   delete positions[bookId];
   state = {

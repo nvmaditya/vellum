@@ -4,14 +4,13 @@ import { ListenView } from "@/components/vellum/listen-view";
 import { ReaderView } from "@/components/vellum/reader-view";
 import { useNarration } from "@/components/vellum/use-narration";
 import { hydrateLibrary, rememberPosition, useLibrary } from "@/lib/reading/store";
-import { SAMPLE_ID } from "@/lib/reading/model";
 
 type Screen = "library" | "read" | "listen";
 
 export function VellumApp() {
   const library = useLibrary();
-  const [screen, setScreen] = useState<Screen>("read");
-  const [bookId, setBookId] = useState<string | null>(SAMPLE_ID);
+  const [screen, setScreen] = useState<Screen>("library");
+  const [bookId, setBookId] = useState<string | null>(null);
   const book = library.books.find((item) => item.id === bookId) ?? null;
   const narration = useNarration(book, library.settings);
 
